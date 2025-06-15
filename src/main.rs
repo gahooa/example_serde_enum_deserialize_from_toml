@@ -6,6 +6,7 @@ pub struct Server {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Listen {
     Http {
         tcp_port: u16,
@@ -17,47 +18,9 @@ pub enum Listen {
     },
 }
 
-// Helper structs for flat TOML parsing
-#[derive(Debug, Deserialize)]
-struct FlatServer {
-    listen: FlatListen,
-}
-
-#[derive(Debug, Deserialize)]
-struct FlatListen {
-    http: Option<HttpConfig>,
-    https: Option<HttpsConfig>,
-}
-
-#[derive(Debug, Deserialize)]
-struct HttpConfig {
-    tcp_port: u16,
-}
-
-#[derive(Debug, Deserialize)]
-struct HttpsConfig {
-    tcp_port_http_redirect: Option<u16>,
-    tcp_port: u16,
-    udp_port: Option<u16>,
-}
-
 fn parse_server_config(toml_str: &str) -> Result<Server, Box<dyn std::error::Error>> {
-    let flat: FlatServer = toml::from_str(toml_str)?;
-    
-    let listen = match (flat.listen.http, flat.listen.https) {
-        (Some(http), None) => Listen::Http {
-            tcp_port: http.tcp_port,
-        },
-        (None, Some(https)) => Listen::Https {
-            tcp_port_http_redirect: https.tcp_port_http_redirect,
-            tcp_port: https.tcp_port,
-            udp_port: https.udp_port,
-        },
-        (Some(_), Some(_)) => return Err("Cannot specify both http and https".into()),
-        (None, None) => return Err("Must specify either http or https".into()),
-    };
-    
-    Ok(Server { listen })
+    let server: Server = toml::from_str(toml_str)?;
+    Ok(server)
 }
 
 fn main() {
