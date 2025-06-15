@@ -1,0 +1,10 @@
+# Example HTTP configuration
+listen.http.tcp_port = 8000
+
+# Example HTTPS configuration (full)
+# listen.https.tcp_port = 443
+# listen.https.tcp_port_http_redirect = 80
+# listen.https.udp_port = 443
+
+# Example HTTPS configuration (minimal)
+# listen.https.tcp_port = 443
